@@ -1,1 +1,2 @@
-web: bin/web
+web:     bin/web
+monitor: bin/monitor

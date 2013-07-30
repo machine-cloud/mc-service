@@ -1,13 +1,18 @@
 {
-  "name":    "template",
+  "name":    "mc-service",
   "version": "0.0.1",
 
   "dependencies": {
     "async":         "0.2.x",
     "coffee-script": "1.2.x",
     "express":       "3.0.x",
+    "faye":          "0.8.x",
+    "jade":          "0.31.x",
+    "mqtt":          "0.2.x",
     "nodemon":       "0.7.x",
-    "node-uuid":     "1.4.x"
+    "node-uuid":     "1.4.x",
+    "redis-url":     "0.1.x",
+    "sockjs":        "0.3.x"
   },
 
   "engines": {

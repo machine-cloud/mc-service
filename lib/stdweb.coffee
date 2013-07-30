@@ -1,5 +1,6 @@
 coffee  = require("coffee-script")
 express = require("express")
+http    = require("http")
 log     = require("./logger").init("banker")
 
 class Stdweb
@@ -12,6 +13,7 @@ class Stdweb
 
 module.exports = (name) ->
   app = express()
+  app.server = http.createServer(app)
   app.disable "x-powered-by"
 
   express.logger.format "method",     (req, res) -> req.method.toLowerCase()
@@ -29,7 +31,7 @@ module.exports = (name) ->
     if port instanceof Function
       cb = port
       port = process.env.PORT
-    @listen port, ->
+    @server.listen port, ->
       cb port
 
   app
