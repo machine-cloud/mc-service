@@ -15,6 +15,12 @@ app.use express.static("#{__dirname}/public")
 app.get "/", (req, res) ->
   res.render "index.jade"
 
+auth_required = express.basicAuth (user, pass) ->
+  if process.env.HTTP_PASSWORD then pass == process.env.HTTP_PASSWORD else true
+
+app.get "/service/mqtt", auth_required, (req, res) ->
+  res.send process.env.MQTT_URL
+
 socket = new faye.NodeAdapter(mount:"/faye")
 
 # socket.bind "handshake", (client) ->
