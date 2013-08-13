@@ -2,13 +2,10 @@ html
 
   head
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    style
+      body { padding-top: 60px; }
     link(rel="stylesheet", href="/css/bootstrap.min.css")
     link(rel="stylesheet", href="/css/bootstrap-responsive.min.css")
-    link(rel="stylesheet", href="/css/service.css")
-    script(type="text/javascript", src="http://code.jquery.com/jquery-1.10.1.min.js")
-    script(type="text/javascript", src="/faye/client.js")
-    script(type="text/javascript", src="/js/bootstrap.min.js")
-    script(type="text/javascript", src="/js/index.js")
     block head
 
   body
@@ -22,11 +19,15 @@ html
           a.brand(href="/") Machine Cloud
           .nav-collapse.collapse
             ul.nav
-              li.active
-                a(href="/devices") Devices
-              li
-                a(href="/routers") Routers
-              li
-                a(href="/models")  Models
+              != navigation('Stats', '/stats')
+              != navigation('Devices', '/devices')
+              != navigation('Models', '/models')
     .container
       block content
+
+    script(type="text/javascript", src="http://code.jquery.com/jquery-1.10.1.min.js")
+    script(type="text/javascript", src="/faye/client.js")
+    script(type="text/javascript", src="/js/bootstrap.min.js")
+    script(type="text/javascript", src="/js/jquery.timeago.js")
+    script(type="text/javascript", src="/js/service.js")
+    block script

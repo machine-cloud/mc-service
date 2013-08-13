@@ -1,7 +1,12 @@
 extends layout
 
+block script
+
+  script(src="/js/stats.js")
+
 block content
-  table
+
+  table.table.table-striped.table-bordered#stats
     tr
       th Messages per Second
       td#messages 0

@@ -1,14 +1,18 @@
 extends layout
 
+block script
+
+  script(src="/js/devices.js")
+
 block content
 
-  table.table.table-striped.table-bordered
+  table.table.table-striped.table-bordered#devices
     thead
       tr
-        th Foo
-        th Bar
+        th ID
+        th Last Message
     tbody
       each device in devices
-        tr
-          td= device.id
-          td= device.last
+        tr(id="device.#{device.id}")
+          td.id= device.id
+          td.time.timeago(title=device.last)= device.last
