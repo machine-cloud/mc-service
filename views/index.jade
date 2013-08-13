@@ -1,20 +1,10 @@
-html
+extends layout
 
-  head
-    script(type="text/javascript", src="http://code.jquery.com/jquery-1.10.1.min.js")
-    script(type="text/javascript", src="/faye/client.js")
-    script(type="text/javascript", src="/javascripts/index.js")
-
-    style
-      table { border-collapse: collapse }
-      th, td { border: 1px #000 solid; padding: 8px 12px; }
-      th { text-align: left; }
-
-  body
-    table
-      tr
-        th Messages per Second
-        td#messages 0
-      tr
-        th Client Count
-        td#clients
+block content
+  table
+    tr
+      th Messages per Second
+      td#messages 0
+    tr
+      th Device Count
+      td#devices

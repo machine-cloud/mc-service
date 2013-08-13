@@ -14,6 +14,10 @@ module.exports =
 
   merge: coffee.helpers.merge
 
+  now: -> (new Date()).getTime()
+
+  random: (digits=1) -> Math.random().toString().slice(2, digits+2)
+
   reduce: (obj, start, cb) -> obj.reduce(cb, start)
 
   values: (hash) -> (val for key, val of hash)

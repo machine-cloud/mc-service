@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+  table.table.table-striped.table-bordered
+    thead
+      tr
+        th Foo
+        th Bar
+    tbody
+      each device in devices
+        tr
+          td= device.id
+          td= device.last
