@@ -24,18 +24,18 @@ app.get "/", (req, res) ->
 app.get "/stats", (req, res) ->
   res.render "stats.jade"
 
-auth_required = express.basicAuth (user, pass) ->
-  if process.env.HTTP_PASSWORD then pass == process.env.HTTP_PASSWORD else true
-
-app.get "/service/mqtt", auth_required, (req, res) ->
-  res.send process.env.MQTT_URL
-
 app.get "/devices", (req, res) ->
   redis.zrange "devices", 0, -1, "WITHSCORES", (err, devices) ->
     devices = (idx for idx in [0..devices.length-1] by 2).map (idx) ->
       id: devices[idx]
       last: new Date(parseInt(devices[idx+1])).toISOString()
     res.render "devices.jade", devices:devices
+
+auth_required = express.basicAuth (user, pass) ->
+  if process.env.HTTP_PASSWORD then pass == process.env.HTTP_PASSWORD else true
+
+app.get "/service/mqtt", auth_required, (req, res) ->
+  res.send process.env.MQTT_URL
 
 socket = new faye.NodeAdapter(mount:"/faye")
 
