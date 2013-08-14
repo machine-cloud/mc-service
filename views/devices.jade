@@ -12,7 +12,3 @@ block content
         th ID
         th Last Message
     tbody
-      each device in devices
-        tr(id="device.#{device.id}")
-          td.id= device.id
-          td.time.timeago(title=device.last)= device.last

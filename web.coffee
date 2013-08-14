@@ -2,7 +2,7 @@ async   = require("async")
 coffee  = require("coffee-script")
 dd      = require("./lib/dd")
 express = require("express")
-faye    = require("faye")
+faye    = require("./lib/faye-redis-url")
 log     = require("./lib/logger").init("service.web")
 redis   = require("redis-url").connect(process.env.REDISGREEN_URL)
 sockjs  = require("sockjs")
@@ -25,11 +25,14 @@ app.get "/stats", (req, res) ->
   res.render "stats.jade"
 
 app.get "/devices", (req, res) ->
+  res.render "devices.jade"
+
+app.get "/devices.json", (req, res) ->
   redis.zrange "devices", 0, -1, "WITHSCORES", (err, devices) ->
     devices = (idx for idx in [0..devices.length-1] by 2).map (idx) ->
       id: devices[idx]
       last: new Date(parseInt(devices[idx+1])).toISOString()
-    res.render "devices.jade", devices:devices
+    res.json devices
 
 auth_required = express.basicAuth (user, pass) ->
   if process.env.HTTP_PASSWORD then pass == process.env.HTTP_PASSWORD else true
@@ -37,7 +40,7 @@ auth_required = express.basicAuth (user, pass) ->
 app.get "/service/mqtt", auth_required, (req, res) ->
   res.send process.env.MQTT_URL
 
-socket = new faye.NodeAdapter(mount:"/faye")
+socket = faye.init(process.env.REDISGREEN_URL)
 
 # socket.bind "handshake", (client) ->
 #   redis.zadd "devices", (new Date()).getTime() + 5000, client
@@ -55,27 +58,6 @@ notifications = (key, cb) ->
       cb err, replies[0]
 
 dd.every 1000, ->
-  log.start "tick.notifications", (log) ->
-    async.parallel
-      device_add: (cb) ->
-        notifications "device:add", (err, devices) ->
-          for device in devices
-            socket.getClient().publish "/devices/add", id:device
-          cb err
-      device_remove: (cb) ->
-        notifications "device:remove", (err, devices) ->
-          for device in devices
-            socket.getClient().publish "/devices/remove", id:device
-          cb err
-      tick: (cb) ->
-        notifications "tick", (err, ticks) ->
-          for tick in ticks
-            socket.getClient().publish "/ticks", JSON.parse(tick)
-      (err, res) ->
-        console.log "err", err
-        console.log "res", res
-
-dd.every 1000, ->
   log.start "tick.stats", (log) ->
     async.parallel
       messages: (cb) -> redis.zcard "ticks", cb
@@ -85,7 +67,7 @@ dd.every 1000, ->
           "messages": Math.round(parseInt(results.messages || "0") / 5)
           "devices": parseInt(results.devices  || "0")
         socket.getClient().publish "/stats", stats
-        log.success stats
+        # log.success stats
 
 app.start (port) ->
   console.log "listening on #{port}"
