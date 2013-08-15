@@ -21,9 +21,12 @@ mqtt.on "message", (topic, body) ->
   log.start "message", (log) ->
     switch topic
       when "connect"
-        redis.zadd "devices", dd.now(), message.id, (err, added) ->
-          socket.publish "/device/add", id:message.id if added is 1
-          log.success()
+        redis.multi()
+          .zadd("devices", dd.now(), message.id)
+          .sadd("devices:#{message.model}", message.id)
+          .exec (err, res) ->
+            socket.publish "/device/add", id:message.id, model:message.model if res[0] is 1
+            log.success()
       when "disconnect"
         redis.zrem "devices", message.id, (err, removed) ->
           socket.publish "/device/remove", id:message.id if removed is 1
@@ -31,8 +34,9 @@ mqtt.on "message", (topic, body) ->
       when "tick"
         redis.zadd "ticks", dd.now(), "#{message.id}.#{dd.random(8)}"
         redis.zadd "devices", dd.now(), message.id, (err, added) ->
-          socket.publish "/device/add", id:message.id if added is 1
-          log.success()
+          redis.get "metric:#{message.id}:model", (err, model) ->
+            socket.publish "/device/add", id:message.id, model:model if added is 1
+            log.success()
         redis.set "metric:#{message.id}:#{message.key}", message.value if message.key
         socket.publish "/tick/#{message.id.replace(".", "-")}", message
         log.success message

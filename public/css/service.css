@@ -30,3 +30,12 @@ th.right, td.right {
   color: #aaa;
   margin-right: 12px;
 }
+
+.model h3, .model h4 {
+  display: inline-block;
+}
+
+.model h4 {
+  color: #999;
+  margin-left: 22px;
+}

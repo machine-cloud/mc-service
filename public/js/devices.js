@@ -5,7 +5,7 @@ $(window).ready(function() {
 
   function device_add(device) {
     console.log('device_add', device);
-    var body = $('table#devices tbody');
+    var body = $('.model#model-' + device.model + ' table#devices tbody');
     var row = $('<tr id="device.' + device.id + '">');
     row.append('<td class="id">' + device.id + '</td>');
     row.append('<td class="timeago time"></td>');
@@ -37,11 +37,19 @@ $(window).ready(function() {
     device_remove(device);
   });
 
-  $.getJSON('/devices.json', function(data) {
-    $.each(data, function(device) {
-      device_add(this);
+  $('.model').each(function(idx, model) {
+    $.getJSON('/devices/' + $(model).data('name') + '.json', function (devices) {
+      $.each(devices, function(idx, device) {
+        device_add(device);
+      });
     });
   });
+
+  // $.getJSON('/devices.json', function(data) {
+  //   $.each(data, function(device) {
+  //     device_add(this);
+  //   });
+  // });
 
   $('.timeago').timeago();
 

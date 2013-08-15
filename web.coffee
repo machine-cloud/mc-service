@@ -26,14 +26,13 @@ app.get "/stats", (req, res) ->
   res.render "stats/index.jade"
 
 app.get "/devices", (req, res) ->
-  res.render "devices/index.jade"
+  store.list "model", (err, models) ->
+    models.sort (a, b) -> a.name.localeCompare(b.name)
+    res.render "devices/index.jade", models:models
 
-app.get "/devices.json", (req, res) ->
-  redis.zrange "devices", 0, -1, "WITHSCORES", (err, devices) ->
-    devices = (idx for idx in [0..devices.length-1] by 2).map (idx) ->
-      id: devices[idx]
-      last: new Date(parseInt(devices[idx+1])).toISOString()
-    res.json devices
+app.get "/devices/:model.json", (req, res) ->
+  redis.smembers "devices:#{req.params.model}", (err, devices) ->
+    res.json devices.reduce(((ax, device) -> ax.push(id:device, model:req.params.model); ax), [])
 
 app.get "/models", (req, res) ->
   res.render "models/index.jade"

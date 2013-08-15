@@ -6,9 +6,14 @@ block script
 
 block content
 
-  table.table.table-striped.table-bordered#devices
-    thead
-      tr
-        th ID
-        th Last Message
-    tbody
+  each model in models
+    .container.model(id="model-#{model.name}", data-name=model.name)
+      h3= model.name
+      h4= model.description
+
+      table.table.table-striped.table-bordered#devices
+        thead
+          tr
+            th ID
+            th Last Message
+        tbody
