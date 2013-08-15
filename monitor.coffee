@@ -1,13 +1,11 @@
 async  = require("async")
 dd     = require("./lib/dd")
+faye   = require("faye")
 log    = require("./lib/logger").init("service.monitor")
 mqtt   = require("./lib/mqtt-url").connect(process.env.MQTT_URL)
-redis  = require("redis-url").connect(process.env.REDISGREEN_URL)
+redis  = require("redis-url").connect(process.env.REDIS_URL)
 
-faye = require("faye")
 socket = new faye.Client(process.env.FAYE_URL)
-
-#socket = require("./lib/faye-redis-url").init(process.env.REDISGREEN_URL)
 
 mqtt.on "connect", ->
   log.start "connect", (log) ->
@@ -23,13 +21,8 @@ mqtt.on "message", (topic, body) ->
   log.start "message", (log) ->
     switch topic
       when "connect"
-        console.log "connect"
         redis.zadd "devices", dd.now(), message.id, (err, added) ->
-          if added is 1
-            console.log "adding", message
-            socket.publish "/device/add", id:message.id, (foo, bar) ->
-              console.log "foo", foo
-              console.log "bar", bar
+          socket.publish "/device/add", id:message.id if added is 1
           log.success()
       when "disconnect"
         redis.zrem "devices", message.id, (err, removed) ->
@@ -40,6 +33,7 @@ mqtt.on "message", (topic, body) ->
         redis.zadd "devices", dd.now(), message.id, (err, added) ->
           socket.publish "/device/add", id:message.id if added is 1
           log.success()
+        redis.set "metric:#{message.id}:#{message.key}", message.value if message.key
         socket.publish "/tick/#{message.id.replace(".", "-")}", message
         log.success message
 
@@ -48,9 +42,9 @@ dd.every 1000, ->
     async.parallel
       devices: (cb) -> redis.zrangebyscore "devices", 0, dd.now() - 2000, (err, devices) ->
         for device in devices
-          console.log "removing", device
           redis.zrem "devices", device
           socket.publish "/device/remove", id:device
         cb err, devices
+        log.success(devices:devices.join(",")) if devices.length > 0
       ticks:   (cb) -> redis.zremrangebyscore "ticks",   0, dd.now() - 5000, cb
-      (err, res)    -> if err then log.error(err) # else log.success(res)
+      (err, res)    -> if err then log.error(err)

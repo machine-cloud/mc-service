@@ -22,7 +22,7 @@ module.exports = (name) ->
 
   app.use express.logger
     buffer: false
-    format: "ns=\"banker\" measure=\"http.:method\" source=\":url\" status=\":status\" elapsed=\":response-time\" from=\":remote-addr\" agent=\":user-agent\""
+    format: "ns=\"banker\" measure=\"http.:method\" source=\":url\" status=\":status\" elapsed=\":response-time\" from=\":remote-addr\""
 
   app.use express.cookieParser()
   app.use express.bodyParser()

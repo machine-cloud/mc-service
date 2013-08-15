@@ -4,9 +4,10 @@ dd      = require("./lib/dd")
 express = require("express")
 faye    = require("./lib/faye-redis-url")
 log     = require("./lib/logger").init("service.web")
-redis   = require("redis-url").connect(process.env.REDISGREEN_URL)
+redis   = require("redis-url").connect(process.env.REDIS_URL)
 sockjs  = require("sockjs")
 stdweb  = require("./lib/stdweb")
+store   = require("./lib/store").init("#{process.env.COUCHDB_URL}/mc-service")
 
 app = stdweb("mc-service")
 
@@ -40,7 +41,7 @@ auth_required = express.basicAuth (user, pass) ->
 app.get "/service/mqtt", auth_required, (req, res) ->
   res.send process.env.MQTT_URL
 
-socket = faye.init(process.env.REDISGREEN_URL)
+socket = faye.init(process.env.REDIS_URL)
 
 # socket.bind "handshake", (client) ->
 #   redis.zadd "devices", (new Date()).getTime() + 5000, client

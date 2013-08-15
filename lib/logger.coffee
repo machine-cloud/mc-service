@@ -1,4 +1,5 @@
 coffee = require("coffee-script")
+dd     = require("./dd")
 uuid   = require("node-uuid")
 
 class Logger
@@ -12,10 +13,9 @@ class Logger
 
   write_status: (status, options={}) ->
     opts = coffee.helpers.merge(@options, options)
-    opts.measure = "#{opts.measure}.#{status}"
-    if @started
-      opts.value = (new Date().getTime()) - @started
-      opts.units = "ms"
+    opts.measure = "#{opts.measure}"
+    opts.status = status
+    opts.elapsed = dd.now() - @started if @started
     @write opts
 
   log: (opts={}, cb) ->
@@ -32,7 +32,7 @@ class Logger
     options = coffee.helpers.merge(@options, opts)
     finish  = new Date().getTime()
     elapsed = finish - @start
-    @write coffee.helpers.merge(options, value:elapsed, units:"ms")
+    @write coffee.helpers.merge(options, elapsed:"#{elapsed}ms")
 
   start: (measure, options={}, cb) ->
     if options instanceof Function
