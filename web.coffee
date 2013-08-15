@@ -23,10 +23,10 @@ app.get "/", (req, res) ->
   res.redirect "/stats"
 
 app.get "/stats", (req, res) ->
-  res.render "stats.jade"
+  res.render "stats/index.jade"
 
 app.get "/devices", (req, res) ->
-  res.render "devices.jade"
+  res.render "devices/index.jade"
 
 app.get "/devices.json", (req, res) ->
   redis.zrange "devices", 0, -1, "WITHSCORES", (err, devices) ->
