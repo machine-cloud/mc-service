@@ -1,3 +1,15 @@
-body {
-  padding-top: 60px;
+table.fixed {
+  table-layout: fixed;
+}
+
+th.expand, td.expand {
+  width: 100%;
+}
+
+th.nowrap, td.nowrap {
+  white-space: nowrap;
+}
+
+th.right, td.right {
+  text-align: right;
 }

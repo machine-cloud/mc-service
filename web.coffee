@@ -35,6 +35,34 @@ app.get "/devices.json", (req, res) ->
       last: new Date(parseInt(devices[idx+1])).toISOString()
     res.json devices
 
+app.get "/models", (req, res) ->
+  res.render "models/index.jade"
+
+app.get "/models/new", (req, res) ->
+  res.render "models/new.jade"
+
+app.post "/models", (req, res) ->
+  store.create "model", dd.merge(JSON.parse(req.body.body), name:req.body.name), (err, model) ->
+    res.redirect "/models"
+
+app.get "/models/:id/edit", (req, res) ->
+  store.fetch "model", req.params.id, (err, model) ->
+    res.render "models/edit.jade", model:model
+
+app.post "/models/:id", (req, res) ->
+  store.fetch "model", req.params.id, (err, model) ->
+    store.update "model", req.params.id, dd.merge(JSON.parse(req.body.body), name:req.body.name), (err, model) ->
+      res.redirect "/models"
+
+app.get "/models/:id/delete", (req, res) ->
+  store.delete "model", req.params.id, (err, model) ->
+    res.redirect "/models"
+
+app.get "/models.json", (req, res) ->
+  store.list "model", (err, models) ->
+    console.log "models", models
+    res.json models
+
 auth_required = express.basicAuth (user, pass) ->
   if process.env.HTTP_PASSWORD then pass == process.env.HTTP_PASSWORD else true
 

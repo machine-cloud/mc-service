@@ -1,0 +1,31 @@
+extends ../layout
+
+block script
+
+  script(src="/js/models.js")
+
+block content
+
+  .container
+    form(method="post", action="/models")
+      fieldset
+        legend New Model
+
+        label(for="name") Name
+        input(type="text", id="name", placeholder="SENSOR001", name="name")
+        
+        label(for="body") Body
+        textarea.input-xxlarge#body(rows=15, name="body")
+          | { 
+          |   "description": "External sensor",
+          |   "inputs": {
+          |     "in_one": "float",
+          |     "in_two": "integer",
+          |   },
+          |   "outputs": {
+          |     "in_three": "boolean",
+          |     "in_four":  "rgb"
+          |   }
+          | }
+
+      input(type="submit", value="Save").btn.btn-primary

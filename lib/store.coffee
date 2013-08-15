@@ -24,10 +24,10 @@ class Store
     @db.create (err) =>
       @db.save "_design/model",
         filters:
-          all: (doc, req) -> doc.type is "dyno"
+          all: (doc, req) -> doc.type is "model"
         views:
           all:
-            map: (doc) -> emit doc._id, null if doc.type is "dyno"
+            map: (doc) -> emit doc._id, null if doc.type is "model"
 
   create: (type, attrs, cb) ->
     attrs.type = type
@@ -45,9 +45,18 @@ class Store
       @db.save id, coffee.helpers.merge(doc, changes), (err, res) =>
         if err then cb(err) else @db.get(id, cb)
 
-  list: (type, opts={}, cb) ->
+  delete: (type, id, cb) ->
+    @fetch type, id, (err, doc) =>
+      @db.remove id, doc._rev, (err) ->
+        cb err, doc
+
+  list: (type, opts, cb) ->
+    if typeof(opts) is "function"
+      cb = opts
+      opts = {}
     options = coffee.helpers.merge(opts, include_docs:true)
-    @db.view "#{type}/list", options, cb
+    @db.view "#{type}/all", options, (err, items) ->
+      cb null, items.map (item) -> item
 
   filter: (type) ->
     coffee.eval """
