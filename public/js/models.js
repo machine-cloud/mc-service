@@ -5,10 +5,10 @@ $(window).ready(function() {
   function model_add(model) {
     console.log('model_add', model);
     var body = $('table#models tbody');
-    var row = $('<tr id="model.' + model.id + '">');
+    var row = $('<tr id="model.' + model._id + '">');
     row.append('<td>' + model.name + '</td>');
-    row.append('<td>' + model.inputs + '</td>');
-    row.append('<td>' + model.outputs + '</td>');
+    row.append('<td>' + display_io(model.inputs) + '</td>');
+    row.append('<td>' + display_io(model.outputs) + '</td>');
     row.append('<td class="nowrap">' +
       '<a href="/models/' + model._id + '/edit" class="btn btn-primary">Edit</a>' +
       '&nbsp;' +
@@ -26,11 +26,12 @@ $(window).ready(function() {
     }
   }
 
-  function tick(message) {
-    console.log('tick', message);
-    var row = $('tr[id="model.' + message.id + '"]');
-    row.find('.time').attr('title', (new Date()).toISOString());
-    $('.timeago').timeago('updateFromDOM');
+  function display_io(io) {
+    var output = '';
+    for (var key in io) {
+      output += '<span class="io_key">' + key + '</span><span class="io_type">' + io[key] + '</span>'
+    }
+    return output;
   }
 
   client.subscribe('/model/add', function(model) {

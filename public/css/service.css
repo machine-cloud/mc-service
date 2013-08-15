@@ -13,3 +13,20 @@ th.nowrap, td.nowrap {
 th.right, td.right {
   text-align: right;
 }
+
+.io_key, .io_type {
+  font-size: 0.9em;
+}
+
+.io_type:before {
+  content: ':';
+}
+
+.io_key {
+  font-weight: bold;
+}
+
+.io_type {
+  color: #aaa;
+  margin-right: 12px;
+}
