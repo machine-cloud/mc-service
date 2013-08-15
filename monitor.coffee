@@ -40,7 +40,7 @@ mqtt.on "message", (topic, body) ->
 dd.every 1000, ->
   log.start "purge", (log) ->
     async.parallel
-      devices: (cb) -> redis.zrangebyscore "devices", 0, dd.now() - 2000, (err, devices) ->
+      devices: (cb) -> redis.zrangebyscore "devices", 0, dd.now() - 4000, (err, devices) ->
         for device in devices
           redis.zrem "devices", device
           socket.publish "/device/remove", id:device
