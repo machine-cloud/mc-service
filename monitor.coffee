@@ -24,6 +24,7 @@ mqtt.on "message", (topic, body) ->
         redis.multi()
           .zadd("devices", dd.now(), message.id)
           .sadd("devices:#{message.model}", message.id)
+          .set("device:#{message.id}:model", message.model)
           .exec (err, res) ->
             socket.publish "/device/add", id:message.id, model:message.model if res[0] is 1
             log.success()
@@ -34,7 +35,7 @@ mqtt.on "message", (topic, body) ->
       when "tick"
         redis.zadd "ticks", dd.now(), "#{message.id}.#{dd.random(8)}"
         redis.zadd "devices", dd.now(), message.id, (err, added) ->
-          redis.get "metric:#{message.id}:model", (err, model) ->
+          redis.get "device:#{message.id}:model", (err, model) ->
             socket.publish "/device/add", id:message.id, model:model if added is 1
             log.success()
         redis.set "metric:#{message.id}:#{message.key}", message.value if message.key
@@ -47,7 +48,7 @@ dd.every 1000, ->
       devices: (cb) -> redis.zrangebyscore "devices", 0, dd.now() - 4000, (err, devices) ->
         for device in devices
           redis.zrem "devices", device
-          redis.get "metric:#{device}:model", (err, model) ->
+          redis.get "device:#{device}:model", (err, model) ->
             redis.srem "devices:#{model}", device
           socket.publish "/device/remove", id:device
         cb err, devices
