@@ -5,11 +5,16 @@ $(window).ready(function() {
 
   function device_add(device) {
     console.log('device_add', device);
-    var body = $('.model#model-' + device.model + ' table#devices tbody');
+    var table = $('.model#model-' + device.model + ' table#devices');
+    var tbody = table.find('tbody');
     var row = $('<tr id="device.' + device.id + '">');
     row.append('<td class="id">' + device.id + '</td>');
+    var outputs = $(table).data('outputs').split(',');
+    for (var idx in outputs) {
+      row.append('<td class="' + outputs[idx] + '"></td>');
+    }
     row.append('<td class="timeago time"></td>');
-    body.append(row);
+    tbody.append(row);
     subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
   };
 
@@ -25,6 +30,8 @@ $(window).ready(function() {
   function tick(message) {
     console.log('tick', message);
     var row = $('tr[id="device.' + message.id + '"]');
+    var outputs = $(row).parents('table').data('outputs').split(',');
+    row.find('.' + message.key).text(message.value);
     row.find('.time').attr('title', (new Date()).toISOString());
     $('.timeago').timeago('updateFromDOM');
   }
@@ -44,12 +51,6 @@ $(window).ready(function() {
       });
     });
   });
-
-  // $.getJSON('/devices.json', function(data) {
-  //   $.each(data, function(device) {
-  //     device_add(this);
-  //   });
-  // });
 
   $('.timeago').timeago();
 

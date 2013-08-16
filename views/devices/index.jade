@@ -11,9 +11,11 @@ block content
       h3= model.name
       h4= model.description
 
-      table.table.table-striped.table-bordered#devices
+      table.table.table-striped.table-bordered#devices(data-outputs=outputs(model))
         thead
           tr
             th ID
+            each type, name in model.outputs
+              th= name
             th Last Message
         tbody

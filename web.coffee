@@ -16,8 +16,12 @@ app.use (req, res, next) ->
   res.locals.navigation = (name, path) ->
     klass = if req.path is path then "active" else ""
     "<li class=\"#{klass}\"><a href=\"#{path}\">#{name}</a></li>"
+  res.locals.outputs = (model) ->
+    dd.keys(model.outputs).join(",")
   next()
 app.use app.router
+
+app.locals.pretty = true
 
 app.get "/", (req, res) ->
   res.redirect "/stats"
