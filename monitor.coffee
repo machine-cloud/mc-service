@@ -47,6 +47,8 @@ dd.every 1000, ->
       devices: (cb) -> redis.zrangebyscore "devices", 0, dd.now() - 4000, (err, devices) ->
         for device in devices
           redis.zrem "devices", device
+          redis.get "metric:#{device}:model", (err, model) ->
+            redis.srem "devices:#{model}", device
           socket.publish "/device/remove", id:device
         cb err, devices
         log.success(devices:devices.join(",")) if devices.length > 0
