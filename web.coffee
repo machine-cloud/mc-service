@@ -63,7 +63,6 @@ app.get "/models/:id/delete", (req, res) ->
 
 app.get "/models.json", (req, res) ->
   store.list "model", (err, models) ->
-    console.log "models", models
     res.json models
 
 auth_required = express.basicAuth (user, pass) ->
@@ -101,5 +100,6 @@ dd.every 1000, ->
         socket.getClient().publish "/stats", stats
         # log.success stats
 
-app.start (port) ->
-  console.log "listening on #{port}"
+log.start "listen", (log) ->
+  app.start (port) ->
+    log.success port:port
