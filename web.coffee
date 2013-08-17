@@ -4,6 +4,7 @@ dd      = require("./lib/dd")
 express = require("express")
 faye    = require("./lib/faye-redis-url")
 log     = require("./lib/logger").init("service.web")
+mqtt    = require("./lib/mqtt-url").connect(process.env.MQTT_URL)
 redis   = require("redis-url").connect(process.env.REDIS_URL)
 sockjs  = require("sockjs")
 stdweb  = require("./lib/stdweb")
@@ -16,8 +17,8 @@ app.use (req, res, next) ->
   res.locals.navigation = (name, path) ->
     klass = if req.path is path then "active" else ""
     "<li class=\"#{klass}\"><a href=\"#{path}\">#{name}</a></li>"
-  res.locals.outputs = (model) ->
-    dd.keys(model.outputs).join(",")
+  res.locals.outputs = (model) -> dd.keys(model.outputs).join(",")
+  res.locals.inputs = (model) -> dd.keys(model.inputs).join(",")
   next()
 app.use app.router
 
@@ -37,6 +38,10 @@ app.get "/devices", (req, res) ->
 app.get "/devices/:model.json", (req, res) ->
   redis.smembers "devices:#{req.params.model}", (err, devices) ->
     res.json devices.reduce(((ax, device) -> ax.push(id:device, model:req.params.model); ax), [])
+
+app.post "/message/:id", (req, res) ->
+  mqtt.publish "device.#{req.params.id}", JSON.stringify(dd.merge(req.body, id:process.env.ID)), (err) ->
+    res.send "ok"
 
 app.get "/models", (req, res) ->
   res.render "models/index.jade"

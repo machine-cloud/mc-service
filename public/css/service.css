@@ -39,3 +39,7 @@ th.right, td.right {
   color: #999;
   margin-left: 22px;
 }
+
+.led input, .led button {
+  height: 30px;
+}

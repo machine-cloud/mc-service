@@ -13,6 +13,23 @@ $(window).ready(function() {
     for (var idx in outputs) {
       row.append('<td class="' + outputs[idx] + '"></td>');
     }
+    var inputs = $(table).data('inputs').split(',');
+    for (var idx in inputs) {
+      row.append('<td class="led"><input type="text" class="input-small rgb" data-id="' + device.id + '" name="' + device.id + '-led" value="000000"></div></td>');
+    }
+    $('.rgb').pickAColor();
+    $('.rgb').on('change', function(foo, bar) {
+      var val = $(this).val();
+      var r = (parseInt(val.slice(0, 2), 16) / 255).toFixed(2);
+      var g = (parseInt(val.slice(2, 4), 16) / 255).toFixed(2);
+      var b = (parseInt(val.slice(4, 6), 16) / 255).toFixed(2);
+      for (var i=0; i<3; i++) {
+        var input = $(this);
+        setTimeout(function() {
+          client.publish('/device/' + input.data('id').replace('.', '-'), { key:"led", value:[r,g,b].join(',') });
+        }, i*100);
+      }
+    });
     row.append('<td class="timeago time"></td>');
     tbody.append(row);
     subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
@@ -28,7 +45,7 @@ $(window).ready(function() {
   }
 
   function tick(message) {
-    console.log('tick', message);
+    //console.log('tick', message);
     var row = $('tr[id="device.' + message.id + '"]');
     var outputs = $(row).parents('table').data('outputs').split(',');
     row.find('.' + message.key).text(message.value);

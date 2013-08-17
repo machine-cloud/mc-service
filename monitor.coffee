@@ -14,6 +14,10 @@ device_add = (device) ->
       async.parallel
         sadd:    (cb) -> redis.sadd "devices:#{device.model}", device.id, cb
         set:     (cb) -> redis.set "device:#{device.id}:model", device.model, cb
+        sub:     (cb) ->
+          socket.subscribe "/device/#{device.id.replace('.', '-')}", (message) ->
+            mqtt.publish "device.#{device.id}", JSON.stringify(message)
+          cb()
         publish: (cb) -> socket.publish "/device/add", device, cb
         (err) -> if err then log.error(err) else log.success()
 
