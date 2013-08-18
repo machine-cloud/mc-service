@@ -16,9 +16,9 @@ $(window).ready(function() {
     var inputs = $(table).data('inputs').split(',');
     for (var idx in inputs) {
       if (inputs[idx] == 'led') {
-        row.append('<td class="led"><input type="text" class="input-small rgb" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
+        row.append('<td class="led"><input type="text" class="input-small rgb" data-name="' + inputs[idx] + '" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
       } else {
-        row.append('<td class="led"><input type="text" class="input-small" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
+        row.append('<td class="led"><input type="text" class="input-small" data-name="' + inputs[idx] + '" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
       }
     }
     row.append('<td class="timeago time"></td>');
@@ -32,7 +32,7 @@ $(window).ready(function() {
       for (var i=0; i<3; i++) {
         var input = $(this);
         setTimeout(function() {
-          client.publish('/device/' + input.data('id').replace('.', '-'), { key:inputs[idx], value:[r,g,b].join(',') });
+          client.publish('/device/' + input.data('id').replace('.', '-'), { key:input.data('name'), value:[r,g,b].join(',') });
         }, i*100);
       }
     });
