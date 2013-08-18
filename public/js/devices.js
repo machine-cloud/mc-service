@@ -15,10 +15,16 @@ $(window).ready(function() {
     }
     var inputs = $(table).data('inputs').split(',');
     for (var idx in inputs) {
-      row.append('<td class="led"><input type="text" class="input-small rgb" data-id="' + device.id + '" name="' + device.id + '-led" value="000000"></div></td>');
+      if (inputs[idx] == 'led') {
+        row.append('<td class="led"><input type="text" class="input-small rgb" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
+      } else {
+        row.append('<td class="led"><input type="text" class="input-small" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
+      }
     }
-    $('.rgb').pickAColor();
-    $('.rgb').on('change', function(foo, bar) {
+    row.append('<td class="timeago time"></td>');
+    tbody.append(row);
+    $(row).find('.rgb').pickAColor();
+    $(row).find('.rgb').on('change', function() {
       var val = $(this).val();
       var r = (parseInt(val.slice(0, 2), 16) / 255).toFixed(2);
       var g = (parseInt(val.slice(2, 4), 16) / 255).toFixed(2);
@@ -26,12 +32,10 @@ $(window).ready(function() {
       for (var i=0; i<3; i++) {
         var input = $(this);
         setTimeout(function() {
-          client.publish('/device/' + input.data('id').replace('.', '-'), { key:"led", value:[r,g,b].join(',') });
+          client.publish('/device/' + input.data('id').replace('.', '-'), { key:inputs[idx], value:[r,g,b].join(',') });
         }, i*100);
       }
     });
-    row.append('<td class="timeago time"></td>');
-    tbody.append(row);
     subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
   };
 

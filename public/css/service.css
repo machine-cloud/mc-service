@@ -43,3 +43,17 @@ th.right, td.right {
 .led input, .led button {
   height: 30px;
 }
+
+.model td {
+  vertical-align: middle;
+}
+
+.model .input-prepend, .model input {
+  margin-bottom: 0px;
+}
+
+.color-preview {
+  height: 1.2em !important;
+  width: 1.2em !important;
+  margin-bottom: 0px !important;
+}
