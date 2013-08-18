@@ -29,11 +29,11 @@ $(window).ready(function() {
       var r = (parseInt(val.slice(0, 2), 16) / 255).toFixed(2);
       var g = (parseInt(val.slice(2, 4), 16) / 255).toFixed(2);
       var b = (parseInt(val.slice(4, 6), 16) / 255).toFixed(2);
-      for (var i=0; i<3; i++) {
+      for (var i=0; i<5; i++) {
         var input = $(this);
         setTimeout(function() {
           client.publish('/device/' + input.data('id').replace('.', '-'), { key:input.data('name'), value:[r,g,b].join(',') });
-        }, i*100);
+        }, i*200);
       }
     });
     subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
