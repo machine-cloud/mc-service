@@ -8,6 +8,7 @@ $(window).ready(function() {
     var table = $('.model#model-' + device.model + ' table#devices');
     var tbody = table.find('tbody');
     var row = $('<tr id="device.' + device.id + '">');
+    row.append('<td><button class="btn identify" data-id="' + device.id + '">ID</button></td>');
     row.append('<td class="id">' + device.id + '</td>');
     var outputs = $(table).data('outputs').split(',');
     for (var idx in outputs) {
@@ -23,6 +24,9 @@ $(window).ready(function() {
     }
     row.append('<td class="timeago time"></td>');
     tbody.append(row);
+    $(row).find('.identify').on('click', function() {
+      client.publish('/device/' + $(this).data('id').replace('.','-'), { key:'identify', value:'true' });
+    });
     $(row).find('.rgb').pickAColor();
     $(row).find('.rgb').on('change', function() {
       var val = $(this).val();
