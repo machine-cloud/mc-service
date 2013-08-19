@@ -1,0 +1,33 @@
+extends ../layout
+
+block script
+
+  script(src="/js/rules.js")
+
+block content
+
+  .container
+    form(method="post", action="/rules")
+      fieldset
+        legend New Rule
+
+        label Condition
+        .controls
+          select(name="condition.device")
+            option foo
+            option bar
+          select(name="condition.output")
+            option baz
+            option qux
+
+        label Action
+        .controls
+          select(name="action.device")
+            option foo
+            option bar
+          select(name="action.input")
+            option baz
+            option qux
+          input(name="action.value", type="text").input-small
+
+      input(type="submit", value="Save").btn.btn-primary

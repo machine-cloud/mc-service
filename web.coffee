@@ -43,6 +43,32 @@ app.post "/message/:id", (req, res) ->
   mqtt.publish "device.#{req.params.id}", JSON.stringify(dd.merge(req.body, id:process.env.ID)), (err) ->
     res.send "ok"
 
+app.get "/rules", (req, res) ->
+  res.render "rules/index.jade"
+
+app.get "/rules/new", (req, res) ->
+  res.render "rules/new.jade"
+
+app.post "/rules", (req, res) ->
+  rule =
+    condition:
+      device: req.body["condition.device"]
+      output: req.body["condition.output"]
+    action:
+      device: req.body["action.device"]
+      input: req.body["action.input"]
+      value: req.body["action.value"]
+  store.create "rule", rule, (err) ->
+    res.redirect "/rules"
+
+app.get "/rules/:id/delete", (req, res) ->
+  store.delete "rule", req.params.id, (err, rule) ->
+    res.redirect "/rules"
+
+app.get "/rules.json", (req, res) ->
+  store.list "rule", (err, rules) ->
+    res.json rules
+
 app.get "/models", (req, res) ->
   res.render "models/index.jade"
 

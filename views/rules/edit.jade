@@ -1,0 +1,22 @@
+extends ../layout
+
+block script
+
+  script(src="/js/rules.js")
+
+block content
+
+  form(method="post", action="/rules/#{rule._id}")
+
+    fieldset
+
+      legend New Rule
+
+      label(for="name") Name
+      input(type="text", id="name", placeholder="SENSOR001", name="name", value=rule.name)
+      
+      label(for="body") Body
+      textarea.input-xxlarge#body(rows=15, name="body")
+        = JSON.stringify({description:rule.description, inputs:rule.inputs, outputs:rule.outputs}, null, 2)
+
+    input(type="submit", value="Save").btn.btn-primary

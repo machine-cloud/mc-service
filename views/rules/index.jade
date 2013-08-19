@@ -1,0 +1,19 @@
+extends ../layout
+
+block script
+
+  script(src="/js/rules.js")
+
+block content
+
+  table.table.table-striped.table-bordered#rules
+    thead
+      tr
+        th Condition
+        th Action
+        th
+    tbody
+    tfoot
+      tr
+        td(colspan=3)
+          a.btn.btn-primary(href="/rules/new") New Rule

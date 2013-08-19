@@ -28,6 +28,12 @@ class Store
         views:
           all:
             map: (doc) -> emit doc._id, null if doc.type is "model"
+      @db.save "_design/rule",
+        filters:
+          all: (doc, req) -> doc.type is "rule"
+        views:
+          all:
+            map: (doc) -> emit doc._id, null if doc.type is "rule"
 
   create: (type, attrs, cb) ->
     attrs.type = type
