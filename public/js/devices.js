@@ -16,29 +16,35 @@ $(window).ready(function() {
     }
     var inputs = $(table).data('inputs').split(',');
     for (var idx in inputs) {
-      if (inputs[idx] == 'led') {
-        row.append('<td class="led"><input type="text" class="input-small rgb" data-name="' + inputs[idx] + '" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
-      } else {
-        row.append('<td class="led"><input type="text" class="input-small" data-name="' + inputs[idx] + '" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
+      var type = models[device.model].inputs[inputs[idx]];
+      console.log('type', type);
+      switch (type) {
+        case 'integer':
+        case 'float':
+          row.append('<td class="led"><input type="text" class="input-small" data-name="' + inputs[idx] + '" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
+          $(row).find('input').on('change', function() {
+            client.publish('/device/' + $(this).data('id').replace('.', '-'), { key:$(this).data('name'), value:$(this).val() });
+          });
+          break;
+        case 'rgb':
+          row.append('<td class="led"><input type="text" class="input-small rgb" data-name="' + inputs[idx] + '" data-id="' + device.id + '" name="' + device.id + '-' + inputs[idx] + '" value="000000"></div></td>');
+          $(row).find('.rgb').pickAColor();
+          $(row).find('.rgb').on('change', function() {
+            client.publish('/device/' + $(this).data('id').replace('.', '-'), { key:$(this).data('name'), value:$(this).val() });
+          });
+          break;
+        case 'action':
+          row.append('<td class="led"><button data-name="' + inputs[idx] + '" data-id="' + device.id + '" class="btn action">Send</button></td>');
+          $(row).find('.action').on('click', function() {
+            client.publish('/device/' + $(this).data('id').replace('.','-'), { key:$(this).data('name'), value:'true' });
+          });
+          break;
       }
     }
     row.append('<td class="timeago time"></td>');
     tbody.append(row);
     $(row).find('.identify').on('click', function() {
       client.publish('/device/' + $(this).data('id').replace('.','-'), { key:'identify', value:'true' });
-    });
-    $(row).find('.rgb').pickAColor();
-    $(row).find('.rgb').on('change', function() {
-      var val = $(this).val();
-      var r = (parseInt(val.slice(0, 2), 16) / 255).toFixed(2);
-      var g = (parseInt(val.slice(2, 4), 16) / 255).toFixed(2);
-      var b = (parseInt(val.slice(4, 6), 16) / 255).toFixed(2);
-      for (var i=0; i<5; i++) {
-        var input = $(this);
-        setTimeout(function() {
-          client.publish('/device/' + input.data('id').replace('.', '-'), { key:input.data('name'), value:[r,g,b].join(',') });
-        }, i*200);
-      }
     });
     subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
   };
@@ -69,10 +75,18 @@ $(window).ready(function() {
     device_remove(device);
   });
 
-  $('.model').each(function(idx, model) {
-    $.getJSON('/devices/' + $(model).data('name') + '.json', function (devices) {
-      $.each(devices, function(idx, device) {
-        device_add(device);
+  var models = {};
+
+  $.getJSON('/models.json', function(data) {
+    for (var idx in data) {
+      var model = data[idx];
+      models[model.name] = model;
+    }
+    $('.model').each(function(idx, model) {
+      $.getJSON('/devices/' + $(model).data('name') + '.json', function (devices) {
+        $.each(devices, function(idx, device) {
+          device_add(device);
+        });
       });
     });
   });
