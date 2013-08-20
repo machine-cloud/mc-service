@@ -81,7 +81,7 @@ check_rules = (message) ->
     matched_rule = rule
     log.start "rule.match", message, (log) ->
       dd.delay 500, ->
-        mqtt.publish "device.sensor.20481", JSON.stringify(key:matched_rule.action.input, value:matched_rule.action.value)
+        mqtt.publish "device.#{matched_rule.action.device}", JSON.stringify(key:matched_rule.action.input, value:matched_rule.action.value)
         log.success()
 
 reload_rules = ->
