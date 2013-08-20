@@ -57,3 +57,19 @@ th.right, td.right {
   width: 1.2em !important;
   margin-bottom: 0px !important;
 }
+
+.dropdown-toggle {
+  height: 30px;
+}
+
+#rules .compare {
+  width: 50px;
+}
+
+#rules .value-container {
+  display: inline-block;
+}
+
+#rules .value {
+  height: 30px;
+}

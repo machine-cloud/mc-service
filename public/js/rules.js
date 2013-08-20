@@ -6,13 +6,13 @@ $(window).ready(function() {
     console.log('rule_add', rule);
     var body = $('table#rules tbody');
     var row = $('<tr id="rule.' + rule._id + '">');
-    var condition = '';
-    var action = '';
+    var condition = [ rule.condition.device, rule.condition.output, rule.condition.compare, rule.condition.value ].join(' ');
+    var action = [ rule.action.device, rule.action.input ].join(' ') + ' = ' + rule.action.value;
     row.append('<td>' + condition + '</td>');
     row.append('<td>' + action + '</td>');
     row.append('<td class="nowrap">' +
-      '<a href="/rules/' + rule._id + '/edit" class="btn btn-primary">Edit</a>' +
-      '&nbsp;' +
+      // '<a href="/rules/' + rule._id + '/edit" class="btn btn-primary">Edit</a>' +
+      // '&nbsp;' +
       '<a href="/rules/' + rule._id + '/delete" class="btn btn-danger">Delete</a>' +
       '</td>');
     body.append(row);

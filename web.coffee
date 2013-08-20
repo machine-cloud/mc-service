@@ -39,6 +39,18 @@ app.get "/devices/:model.json", (req, res) ->
   redis.smembers "devices:#{req.params.model}", (err, devices) ->
     res.json devices.reduce(((ax, device) -> ax.push(id:device, model:req.params.model); ax), [])
 
+app.get "/devices.json", (req, res) ->
+  store.list "model", (err, models) ->
+    models_by_name = {}
+    models_by_name[model.name] = { name:model.name, inputs:model.inputs, outputs:model.outputs } for model in models
+    console.log "models_by_name", JSON.stringify(models_by_name)
+    redis.zrange "devices", 0, -1, (err, devices) ->
+      async.map devices, ((device, cb) ->
+        redis.get "device:#{device}:model", (err, model) ->
+          cb null, id:device, model:models_by_name[model]),
+        (err, devices) ->
+          res.json devices
+
 app.post "/message/:id", (req, res) ->
   mqtt.publish "device.#{req.params.id}", JSON.stringify(dd.merge(req.body, id:process.env.ID)), (err) ->
     res.send "ok"
@@ -54,6 +66,8 @@ app.post "/rules", (req, res) ->
     condition:
       device: req.body["condition.device"]
       output: req.body["condition.output"]
+      compare: req.body["condition.compare"]
+      value: req.body["condition.value"]
     action:
       device: req.body["action.device"]
       input: req.body["action.input"]
