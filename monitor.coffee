@@ -80,7 +80,7 @@ check_rules = (message) ->
     continue unless matched
     matched_rule = rule
     log.start "rule.match", message, (log) ->
-      dd.delay 500 + parseInt(Math.random() * 500) ->
+      dd.delay 500 + parseInt(Math.random() * 500), ->
         mqtt.publish "device.#{matched_rule.action.device}", JSON.stringify(key:matched_rule.action.input, value:matched_rule.action.value)
         log.success()
 
