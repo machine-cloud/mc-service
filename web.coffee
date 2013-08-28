@@ -1,5 +1,6 @@
 async   = require("async")
 coffee  = require("coffee-script")
+crypto  = require("crypto")
 dd      = require("./lib/dd")
 express = require("express")
 faye    = require("./lib/faye-redis-url")
@@ -12,6 +13,8 @@ store   = require("./lib/store").init("#{process.env.COUCHDB_URL}/mc-service")
 
 app = stdweb("mc-service")
 
+app.use express.cookieSession(secret:process.env.SESSION_SECRET)
+
 app.use express.static("#{__dirname}/public")
 app.use (req, res, next) ->
   res.locals.navigation = (name, path) ->
@@ -19,6 +22,7 @@ app.use (req, res, next) ->
     "<li class=\"#{klass}\"><a href=\"#{path}\">#{name}</a></li>"
   res.locals.outputs = (model) -> dd.keys(model.outputs).join(",")
   res.locals.inputs = (model) -> dd.keys(model.inputs).join(",")
+  res.locals.salesforce = req.session.salesforce
   next()
 app.use app.router
 
@@ -109,6 +113,19 @@ app.get "/models/:id/delete", (req, res) ->
 app.get "/models.json", (req, res) ->
   store.list "model", (err, models) ->
     res.json models
+
+app.post "/canvas", (req, res) ->
+  log.start "canvas.login", (log) ->
+    [signature, encoded_envelope] = req.body.signed_request.split(".")
+    check = crypto.createHmac("sha256", process.env.CANVAS_SECRET).update(encoded_envelope).digest("base64")
+    if check is signature
+      envelope = JSON.parse(new Buffer(encoded_envelope, "base64").toString("ascii"))
+      req.session.salesforce = envelope
+      res.redirect "/"
+      log.success user:envelope.context.user.userName
+    else
+      res.send "invalid", 403
+      log.failure()
 
 auth_required = express.basicAuth (user, pass) ->
   if process.env.HTTP_PASSWORD then pass == process.env.HTTP_PASSWORD else true

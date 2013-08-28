@@ -8,23 +8,20 @@ html
     link(rel="stylesheet", href="/css/bootstrap-responsive.min.css")
     link(rel="stylesheet", href="/css/pick-a-color.min.css")
     link(rel="stylesheet", href="/css/service.css")
+    if salesforce
+      link(rel="stylesheet", href="/css/canvas.css")
     block head
 
   body
     .navbar.navbar-inverse.navbar-fixed-top
       .navbar-inner
         .container
-          button(type="button", data-toggle="collapse", data-target=".nav-collapse").btn.btn-navbar
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
           a.brand(href="/") Machine Cloud
-          .nav-collapse.collapse
-            ul.nav
-              != navigation('Stats', '/stats')
-              != navigation('Devices', '/devices')
-              != navigation('Rules', '/rules')
-              != navigation('Models', '/models')
+          ul.nav
+            != navigation('Stats', '/stats')
+            != navigation('Devices', '/devices')
+            != navigation('Rules', '/rules')
+            != navigation('Models', '/models')
     .container
       block content
 
