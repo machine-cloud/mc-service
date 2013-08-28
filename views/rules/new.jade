@@ -9,8 +9,10 @@ block script
     $('.condition .device').on('change', function() {
       var device = $('.condition .device');
       $('.condition .output option').remove();
-      for (var output in devices[$(device).val()].model.outputs) {
-        $('.condition .output').append('<option>' + output + '</option>');
+      if (devices[$(device).val()]) {
+        for (var output in devices[$(device).val()].model.outputs) {
+          $('.condition .output').append('<option>' + output + '</option>');
+        }
       }
       $('.condition .output').change();
     });
@@ -18,8 +20,10 @@ block script
     $('.action .device').on('change', function() {
       var device = $('.action .device');
       $('.action .input option').remove();
-      for (var input in devices[$(device).val()].model.inputs) {
-        $('.action .input').append('<option>' + input + '</option>');
+      if (devices[$(device).val()]) {
+        for (var input in devices[$(device).val()].model.inputs) {
+          $('.action .input').append('<option>' + input + '</option>');
+        }
       }
       $('.action .input').change();
     });
@@ -27,41 +31,45 @@ block script
     $('.condition .output').on('change', function() {
       var device = $('.condition .device').val();
       var output = $('.condition .output').val();
-      var type = devices[device].model.outputs[output];
-      $('.condition .value-container *').remove();
-      $('.condition .compare').hide();
-      console.log('type', type);
-      switch (type) {
-        case 'integer':
-        case 'float':
-          $('.condition .compare').show();
-          $('.condition .value-container').append('<input name="condition.value" type="text" class="input-small value" />');
-          break;
-        case 'rgb':
-          $('.condition .compare').show();
-          $('.condition .value-container').append('<input name="condition.value" type="text" class="input-small value" />');
-          $('.condition .value').pickAColor();
-          break;
-        case 'action':
-          break;
+      if (devices[device]) {
+        var type = devices[device].model.outputs[output];
+        $('.condition .value-container *').remove();
+        $('.condition .compare').hide();
+        console.log('type', type);
+        switch (type) {
+          case 'integer':
+          case 'float':
+            $('.condition .compare').show();
+            $('.condition .value-container').append('<input name="condition.value" type="text" class="input-small value" />');
+            break;
+          case 'rgb':
+            $('.condition .compare').show();
+            $('.condition .value-container').append('<input name="condition.value" type="text" class="input-small value" />');
+            $('.condition .value').pickAColor();
+            break;
+          case 'action':
+            break;
+        }
       }
     });
 
     $('.action .input').on('change', function() {
       var device = $('.action .device').val();
       var input = $('.action .input').val();
-      var type = devices[device].model.inputs[input];
-      $('.action .value-container *').remove();
-      switch (type) {
-        case 'integer', 'float':
-          $('.action .value-container').append('<input name="action.value" type="text" class="input-small value" />');
-          break;
-        case 'rgb':
-          $('.action .value-container').append('<input name="action.value" type="text" class="input-small value" />');
-          $('.action .value').pickAColor();
-          break;
-        case 'action':
-          break;
+      if (devices[device]) {
+        var type = devices[device].model.inputs[input];
+        $('.action .value-container *').remove();
+        switch (type) {
+          case 'integer', 'float':
+            $('.action .value-container').append('<input name="action.value" type="text" class="input-small value" />');
+            break;
+          case 'rgb':
+            $('.action .value-container').append('<input name="action.value" type="text" class="input-small value" />');
+            $('.action .value').pickAColor();
+            break;
+          case 'action':
+            break;
+        }
       }
     });
 
