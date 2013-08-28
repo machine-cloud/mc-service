@@ -50,13 +50,16 @@ mqtt.on "connect", ->
       (err)      -> if err then log.error(err) else log.success()
 
 mqtt.on "message", (topic, body) ->
-  message = JSON.parse(body)
-  return unless message.id
-  switch topic
-    when "tick"
-      check_rules(message)
-      device_add(id:message.id, model:message.value) if message.key is "model"
-      tick message if message.key
+  try
+    message = JSON.parse(body)
+    return unless message.id
+    switch topic
+      when "tick"
+        check_rules(message)
+        device_add(id:message.id, model:message.value) if message.key is "model"
+        tick message if message.key
+  catch err
+    console.log "message parse error", err
 
 dd.every 1000, ->
   log.start "purge", (log) ->
