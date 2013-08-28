@@ -7,7 +7,10 @@ $(window).ready(function() {
     var body = $('table#rules tbody');
     var row = $('<tr id="rule.' + rule._id + '">');
     var condition = [ rule.condition.device, rule.condition.output, rule.condition.compare, rule.condition.value ].join(' ');
-    var action = [ rule.action.device, rule.action.input ].join(' ') + ' = ' + rule.action.value;
+    var action = [ rule.action.device, rule.action.input ].join(' ');
+    if (rule.action.value) {
+      action += (' = ' + rule.action.value);
+    }
     row.append('<td>' + condition + '</td>');
     row.append('<td>' + action + '</td>');
     row.append('<td class="nowrap">' +

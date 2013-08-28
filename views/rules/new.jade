@@ -20,6 +20,10 @@ block script
     $('.action .device').on('change', function() {
       var device = $('.action .device');
       $('.action .input option').remove();
+      if ($(device).val() == 'salesforce') {
+        $('.action .input').append('<option>case</option>');
+        $('.action .input').append('<option>chatter</option>');
+      }
       if (devices[$(device).val()]) {
         for (var input in devices[$(device).val()].model.inputs) {
           $('.action .input').append('<option>' + input + '</option>');
@@ -85,6 +89,12 @@ block script
         $('.action .device').change();
       });
     });
+
+  if salesforce
+    script
+      $(window).ready(function() {
+        $('.action .device').append('<option>salesforce</option>');
+      });
 
 block content
 

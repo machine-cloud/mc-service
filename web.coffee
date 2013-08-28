@@ -76,6 +76,8 @@ app.post "/rules", (req, res) ->
       device: req.body["action.device"]
       input: req.body["action.input"]
       value: req.body["action.value"]
+  if rule.action.device is "salesforce"
+    rule.action.salesforce = req.session.salesforce
   store.create "rule", rule, (err) ->
     res.redirect "/rules"
 
