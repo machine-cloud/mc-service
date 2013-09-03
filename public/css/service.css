@@ -73,3 +73,6 @@ th.right, td.right {
 #rules .value {
   height: 30px;
 }
+
+canvas#floorplan {
+}

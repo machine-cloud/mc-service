@@ -18,7 +18,7 @@ html
         .container
           a.brand(href="/") Machine Cloud
           ul.nav
-            != navigation('Stats', '/stats')
+            != navigation('Dashboard', '/dashboard')
             != navigation('Devices', '/devices')
             != navigation('Rules', '/rules')
             != navigation('Models', '/models')
@@ -31,5 +31,6 @@ html
     script(type="text/javascript", src="/js/tinycolor.min.js")
     script(type="text/javascript", src="/js/pick-a-color.min.js")
     script(type="text/javascript", src="/js/jquery.timeago.js")
+    script(type="text/javascript", src="/js/jcanvas.min.js")
     script(type="text/javascript", src="/js/service.js")
     block script

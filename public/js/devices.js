@@ -4,7 +4,6 @@ $(window).ready(function() {
   var subs = {}
 
   function device_add(device) {
-    console.log('device_add', device);
     var table = $('.model#model-' + device.model + ' table#devices');
     var tbody = table.find('tbody');
     var row = $('<tr id="device.' + device.id + '">');
@@ -17,7 +16,6 @@ $(window).ready(function() {
     var inputs = $(table).data('inputs').split(',');
     for (var idx in inputs) {
       var type = models[device.model].inputs[inputs[idx]];
-      console.log('type', type);
       switch (type) {
         case 'integer':
         case 'float':
@@ -50,7 +48,6 @@ $(window).ready(function() {
   };
 
   function device_remove(device) {
-    console.log('device_remove', device);
     $('tr[id="device.' + device.id + '"]').remove();
     if (subs[device.id]) {
       subs[device.id].cancel();
@@ -59,7 +56,6 @@ $(window).ready(function() {
   }
 
   function tick(message) {
-    //console.log('tick', message);
     var row = $('tr[id="device.' + message.id + '"]');
     var outputs = $(row).parents('table').data('outputs').split(',');
     row.find('.' + message.key).text(message.value);

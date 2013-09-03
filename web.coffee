@@ -29,10 +29,10 @@ app.use app.router
 app.locals.pretty = true
 
 app.get "/", (req, res) ->
-  res.redirect "/stats"
+  res.redirect "/dashboard"
 
-app.get "/stats", (req, res) ->
-  res.render "stats/index.jade"
+app.get "/dashboard", (req, res) ->
+  res.render "dashboard/index.jade"
 
 app.get "/devices", (req, res) ->
   store.list "model", (err, models) ->

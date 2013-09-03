@@ -24,3 +24,12 @@ body {
   margin-right: 0px;
   width: 800px;
 }
+
+div.pick-a-color-markup .btn-group .color-dropdown {
+  height: 30px;
+}
+
+div.pick-a-color-markup .hex-pound {
+  padding: 4px 5px;
+  min-height: 0px;
+}
