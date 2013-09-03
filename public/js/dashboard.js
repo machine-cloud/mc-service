@@ -34,16 +34,17 @@ $(function() {
   var subs = {};
   var states = {};
 
-  $.getJSON('/devices/ENV01.json', function (devices) {
-    console.log('devices', devices);
-    $.each(devices, function(idx, device) {
-      devices[device.id] = device;
-      subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
-      states[device.id] = 'ok';
-    });
-  });
+  device_add({ id:'sensor.20481' });
+  device_add({ id:'sensor.20482' });
+  device_add({ id:'sensor.20483' });
+  device_add({ id:'sensor.24576' });
 
   var offer = null;
+
+  function device_add(device) {
+    subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
+    states[device.id] = 'ok';
+  }
 
   function tick(message) {
     if (message.key === 'state') {
