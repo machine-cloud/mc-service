@@ -75,4 +75,5 @@ th.right, td.right {
 }
 
 canvas#floorplan {
+  margin-top: -20px;
 }
