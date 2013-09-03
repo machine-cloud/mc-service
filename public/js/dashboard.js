@@ -8,10 +8,10 @@ $(function() {
   });
 
   var locations = {
-    'sensor.20481': { x: 158, y: 226 },
-    'sensor.20482': { x: 513, y: 340 },
-    'sensor.20483': { x: 651, y: 295 },
-    'sensor.24576': { x: 158, y: 226 },
+    'sensor.20481': { x: 150, y: 209 },
+    'sensor.20482': { x: 473, y: 314 },
+    'sensor.20483': { x: 602, y: 272 },
+    'sensor.24576': { x: 150, y: 209 },
   };
 
   var colors = {
