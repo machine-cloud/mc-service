@@ -59,6 +59,10 @@ app.post "/message/:id", (req, res) ->
   mqtt.publish "device.#{req.params.id}", JSON.stringify(dd.merge(req.body, id:process.env.ID)), (err) ->
     res.send "ok"
 
+app.get "/message/:id/:key/:value", (req, res) ->
+  mqtt.publish "device.#{req.params.id}", JSON.stringify(key:req.params.key, value:req.params.value), (err) ->
+    res.send "ok"
+
 app.get "/rules", (req, res) ->
   res.render "rules/index.jade"
 
