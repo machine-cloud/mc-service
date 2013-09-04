@@ -39,7 +39,6 @@ $(window).ready(function() {
           break;
       }
     }
-    row.append('<td class="timeago time"></td>');
     tbody.append(row);
     $(row).find('.identify').on('click', function() {
       client.publish('/device/' + $(this).data('id').replace('.','-'), { key:'identify', value:'true' });

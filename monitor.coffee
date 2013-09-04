@@ -9,7 +9,7 @@ store  = require("./lib/store").init("#{process.env.COUCHDB_URL}/mc-service")
 
 socket = new faye.Client(process.env.FAYE_URL)
 
-cached_rules = {}
+cached_rules = []
 
 device_add = (device) ->
   redis.zadd "devices", dd.now(), device.id, (err, added) ->
@@ -73,49 +73,61 @@ dd.every 1000, ->
       (err, res)    -> if err then log.error(err)
 
 check_rules = (message) ->
-  for rule in cached_rules
-    continue unless rule.condition.device is message.id
-    continue unless rule.condition.output is message.key
-    continue if rule.locked_until and rule.locked_until > dd.now()
-    matched = switch rule.condition.compare
-      when "<" then parseFloat(message.value) < parseFloat(rule.condition.value)
-      when ">" then parseFloat(message.value) > parseFloat(rule.condition.value)
-      when "=" then parseFloat(message.value) is parseFloat(rule.condition.value)
-      else true
-    continue unless matched
-    matched_rule = rule
-    log.start "rule.match", message, (log) ->
-      store.update "rule", matched_rule._id, locked_until:(dd.now() + 10000), (err, res) ->
-        return log.error(err) if err
-        if matched_rule.action.device is "salesforce"
-          force = new sf.Connection(instanceUrl:process.env.SALESFORCE_INSTANCE_URL, accessToken:matched_rule.action.salesforce.client.oauthToken)
-          switch matched_rule.action.input
-            when "case"
-              force.sobject('Case').create
-                OwnerId: process.env.OWNER_ID || "005i0000000dHa7"
-                Reason: "Device Offline"
-                ContactId: process.env.CONTACT_ID || '003i0000008BypF'
-                Device_Id__c: matched_rule.condition.device
-                (err, ret) ->
-                  if err then log.error(err) else log.success case:ret.id
-            when "chatter"
-              body =
-                messageSegments: [
-                  type: "Text"
-                  text: "test post"
-                ]
-              force._request
-                method: "POST"
-                url: force.urls.rest.base + "/chatter/feeds/record/#{process.env.CHATTER_GROUP_ID}/feed-items"
-                body: JSON.stringify(body:body)
-                headers:
-                  "Content-Type": "application/json"
-                (err, data) ->
-                  if err then log.error(err) else log.success chatter:data.id
-        else
-          dd.delay 500, ->
-            mqtt.publish "device.#{matched_rule.action.device}", JSON.stringify(key:matched_rule.action.input, value:matched_rule.action.value)
-            log.success()
+  store.list "model", (err, data) ->
+    models = dd.inject(data, {}, (ax, model) -> ax[model.name] = model; ax)
+    cached_rules.forEach (rule) ->
+      redis.get "device:#{rule.condition.device}:model", (err, model) ->
+        return unless rule.condition.device is message.id
+        return unless rule.condition.output is message.key
+        return if rule.locked_until and rule.locked_until > dd.now()
+        switch models[model].outputs[rule.condition.output]
+          when "string"
+            matched = switch rule.condition.compare
+              when "<" then message.value < rule.condition.value
+              when ">" then message.value > rule.condition.value
+              when "=" then message.value is rule.condition.value
+              else false
+            return unless matched
+          when "integer", "float"
+            matched = switch rule.condition.compare
+              when "<" then parseFloat(message.value) < parseFloat(rule.condition.value)
+              when ">" then parseFloat(message.value) > parseFloat(rule.condition.value)
+              when "=" then parseFloat(message.value) is parseFloat(rule.condition.value)
+              else false
+            return unless matched
+        matched_rule = rule
+        log.start "rule.match", message, (log) ->
+          store.update "rule", matched_rule._id, locked_until:(dd.now() + (parseInt(process.env.RULE_TIMEOUT || "30") * 1000)), (err, res) ->
+            return log.error(err) if err
+            if matched_rule.action.device is "salesforce"
+              force = new sf.Connection(instanceUrl:process.env.SALESFORCE_INSTANCE_URL, accessToken:matched_rule.action.salesforce.client.oauthToken)
+              switch matched_rule.action.input
+                when "case"
+                  force.sobject('Case').create
+                    OwnerId: process.env.OWNER_ID || "005i0000000dHa7"
+                    Reason: "Device Offline"
+                    ContactId: process.env.CONTACT_ID || '003i0000008BypF'
+                    Device_Id__c: matched_rule.condition.device
+                    (err, ret) ->
+                      if err then log.error(err) else log.success case:ret.id
+                when "chatter"
+                  body =
+                    messageSegments: [
+                      type: "Text"
+                      text: "test post"
+                    ]
+                  force._request
+                    method: "POST"
+                    url: force.urls.rest.base + "/chatter/feeds/record/#{process.env.CHATTER_GROUP_ID}/feed-items"
+                    body: JSON.stringify(body:body)
+                    headers:
+                      "Content-Type": "application/json"
+                    (err, data) ->
+                      if err then log.error(err) else log.success chatter:data.id
+            else
+              dd.delay 500, ->
+                mqtt.publish "device.#{matched_rule.action.device}", JSON.stringify(key:matched_rule.action.input, value:matched_rule.action.value)
+                log.success()
 
 reload_rules = ->
   store.list "rule", (err, rules) ->

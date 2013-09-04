@@ -4,6 +4,7 @@ crypto  = require("crypto")
 dd      = require("./lib/dd")
 express = require("express")
 faye    = require("./lib/faye-redis-url")
+force   = require("node-salesforce")
 log     = require("./lib/logger").init("service.web")
 mqtt    = require("./lib/mqtt-url").connect(process.env.MQTT_URL)
 redis   = require("redis-url").connect(process.env.REDIS_URL)
@@ -60,6 +61,7 @@ app.post "/message/:id", (req, res) ->
     res.send "ok"
 
 app.get "/message/:id/:key/:value", (req, res) ->
+  res.setHeader "Access-Control-Allow-Origin", "*"
   mqtt.publish "device.#{req.params.id}", JSON.stringify(key:req.params.key, value:req.params.value), (err) ->
     res.send "ok"
 
@@ -135,6 +137,27 @@ app.post "/canvas", (req, res) ->
 
 auth_required = express.basicAuth (user, pass) ->
   if process.env.HTTP_PASSWORD then pass == process.env.HTTP_PASSWORD else true
+
+app.get "/reset", auth_required, (req, res) ->
+  sf = new force.Connection()
+  sf.login process.env.CRM_USERNAME, process.env.CRM_PASSWORD, (err, user) ->
+    async.parallel
+      case: (aacb) ->
+        sf.query "SELECT Id FROM Case", (err, result) ->
+          async.parallel (result.records.map (record) ->
+            (acb) ->
+              sf.sobject("Case").destroy record.Id, acb),
+            aacb
+      chatter: (aacb) ->
+        sf.query "SELECT Id FROM FeedItem", (err, result) ->
+          async.parallel (result.records.map (record) ->
+            (acb) ->
+              sf.sobject("FeedItem").destroy record.Id, acb),
+          aacb
+      (err, results) ->
+        console.log "err", err
+        console.log "results", results
+        res.send "ok"
 
 app.get "/service/mqtt", auth_required, (req, res) ->
   res.send process.env.MQTT_URL

@@ -12,6 +12,8 @@ module.exports =
 
   keys: (hash) -> key for key, val of hash
 
+  inject: (obj, start, fn) -> obj.reduce(fn, start)
+
   merge: coffee.helpers.merge
 
   now: -> (new Date()).getTime()
