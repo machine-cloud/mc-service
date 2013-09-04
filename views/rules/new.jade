@@ -43,6 +43,7 @@ block script
         switch (type) {
           case 'integer':
           case 'float':
+          case 'string':
             $('.condition .compare').show();
             $('.condition .value-container').append('<input name="condition.value" type="text" class="input-small value" />');
             break;
