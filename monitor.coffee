@@ -85,7 +85,7 @@ check_rules = (message) ->
     continue unless matched
     matched_rule = rule
     log.start "rule.match", message, (log) ->
-      store.update "rule", matched_rule._id, locked_until:(dd.now() + 120000), (err, res) ->
+      store.update "rule", matched_rule._id, locked_until:(dd.now() + 10000), (err, res) ->
         return log.error(err) if err
         if matched_rule.action.device is "salesforce"
           force = new sf.Connection(instanceUrl:process.env.SALESFORCE_INSTANCE_URL, accessToken:matched_rule.action.salesforce.client.oauthToken)
@@ -93,8 +93,9 @@ check_rules = (message) ->
             when "case"
               force.sobject('Case').create
                 OwnerId: process.env.OWNER_ID || "005i0000000dHa7"
-                Reason: "broked"
+                Reason: "Device Offline"
                 ContactId: process.env.CONTACT_ID || '003i0000008BypF'
+                Device_Id__c: matched_rule.condition.device
                 (err, ret) ->
                   if err then log.error(err) else log.success case:ret.id
             when "chatter"
