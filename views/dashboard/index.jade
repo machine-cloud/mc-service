@@ -7,3 +7,16 @@ block script
 block content
 
   canvas#floorplan(height="565px", width="800px")
+
+  #tooltip(style="display:none; position:absolute;")
+    h3#device-name
+    ul#metrics
+      li
+        #metric-humidity.metric
+        .unit %
+      li
+        #metric-pressure.metric
+        .unit mmHg
+      li
+        #metric-temperature.metric
+        .unit &deg;C

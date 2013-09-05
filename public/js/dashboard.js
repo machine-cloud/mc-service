@@ -42,6 +42,8 @@ $(function() {
   device_add({ id:'sensor.24576' });
 
   var offer = null;
+  var inside = [];
+  var active = [];
 
   function device_add(device) {
     subs[device.id] = client.subscribe('/tick/' + device.id.replace('.', '-'), tick);
@@ -60,6 +62,13 @@ $(function() {
     offer = window.setTimeout(function() {
       blip_off(message.id);
     }, 50);
+    if (inside.indexOf(message.id) > -1) {
+      $('#device-name').text(message.id);
+      $('#metric-' + message.key).text(message.value);
+    }
+    if (active.indexOf(message.id) == -1) {
+      active.push(message.id);
+    }
   }
 
   function blip_init(id) {
@@ -89,13 +98,23 @@ $(function() {
   }
 
   $('#floorplan').mousemove(function(e) {
-    var found = false;
+    inside = [];
     for (loc in locations) {
       if (((e.offsetX > (locations[loc].x - radius)) && (e.offsetX < (locations[loc].x + radius))) &&
           ((e.offsetY > (locations[loc].y - radius)) && (e.offsetY < (locations[loc].y + radius)))) {
-        console.log('inside', loc);
-        found = true;
+        inside.push(loc);
+        if (active.indexOf(loc) > -1) {
+          $('#device-name').text(loc);
+          $('#tooltip').css({ left:e.clientX, top:e.clientY });
+          $('#metric-humidity').text('--');
+          $('#metric-pressure').text('--');
+          $('#metric-temperature').text('--');
+          $('#tooltip').show();
+        }
       }
+    }
+    if (inside.length == 0) {
+      $('#tooltip').hide();
     }
   });
 

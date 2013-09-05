@@ -77,3 +77,42 @@ th.right, td.right {
 canvas#floorplan {
   margin-top: -20px;
 }
+
+#tooltip {
+  background-color: #ccc;
+  border: 2px #666 solid;
+  display: none;
+  position: absolute;
+  padding: 10px;
+}
+
+#tooltip h3 {
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 1.0em;
+  height: 20px;
+  line-height: 20px;
+  background-color: #999;
+  margin: -10px -10px 10px -10px;
+}
+
+#tooltip ul {
+  list-style-type: none;
+  margin: 0;
+}
+
+#tooltip li {
+  margin-left: 0;
+}
+
+#tooltip .metric, #tooltip .unit {
+  display: inline-block;
+}
+
+#tooltip .metric {
+  font-weight: bold;
+}
+
+#tooltip .unit {
+  color: #777;
+}
