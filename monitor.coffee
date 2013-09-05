@@ -114,7 +114,7 @@ check_rules = (message) ->
                   body =
                     messageSegments: [
                       type: "Text"
-                      text: "test post"
+                      text: matched_rule.action.value || "Testing Chatter"
                     ]
                   force._request
                     method: "POST"

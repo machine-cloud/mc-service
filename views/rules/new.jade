@@ -39,7 +39,6 @@ block script
         var type = devices[device].model.outputs[output];
         $('.condition .value-container *').remove();
         $('.condition .compare').hide();
-        console.log('type', type);
         switch (type) {
           case 'integer':
           case 'float':
@@ -76,6 +75,9 @@ block script
             break;
         }
       }
+      if (input == 'chatter') {
+        $('.action .value-container').append('<input name="action.value" type="text" class="input-xlarge value" />');
+      }
     });
 
     $(window).ready(function() {
@@ -83,7 +85,6 @@ block script
         for (var idx in data) {
           device = data[idx];
           devices[device.id] = device;
-          console.log('device', device);
           $('.device').append('<option>' + device.id + '</option>');
         };
         $('.condition .device').change();
