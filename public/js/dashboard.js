@@ -14,6 +14,8 @@ $(function() {
     'sensor.24576': { x: 150, y: 209 },
   };
 
+  var radius = 18;
+
   var colors = {
     'ok':    { dark: '#479C43', light: '#2EE324' },
     'error': { dark: '#BA4E4E', light: '#F28080' }
@@ -65,7 +67,7 @@ $(function() {
     $('#floorplan').drawEllipse({
       fillStyle: '#03a',
       x: locations[id].x, y: locations[id].y,
-      width: 24, height: 24
+      width: radius+6, height: radius+6
     });
   }
   function blip_on(id) {
@@ -73,7 +75,7 @@ $(function() {
     $('#floorplan').drawEllipse({
       fillStyle: colors[state].light,
       x: locations[id].x, y: locations[id].y,
-      width: 18, height: 18
+      width: radius, height: radius
     });
   }
 
@@ -82,7 +84,19 @@ $(function() {
     $('#floorplan').drawEllipse({
       fillStyle: colors[state].dark,
       x: locations[id].x, y: locations[id].y,
-      width: 18, height: 18
+      width: radius, height: radius
     });
   }
+
+  $('#floorplan').mousemove(function(e) {
+    var found = false;
+    for (loc in locations) {
+      if (((e.offsetX > (locations[loc].x - radius)) && (e.offsetX < (locations[loc].x + radius))) &&
+          ((e.offsetY > (locations[loc].y - radius)) && (e.offsetY < (locations[loc].y + radius)))) {
+        console.log('inside', loc);
+        found = true;
+      }
+    }
+  });
+
 });
