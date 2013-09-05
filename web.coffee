@@ -48,7 +48,6 @@ app.get "/devices.json", (req, res) ->
   store.list "model", (err, models) ->
     models_by_name = {}
     models_by_name[model.name] = { name:model.name, inputs:model.inputs, outputs:model.outputs } for model in models
-    console.log "models_by_name", JSON.stringify(models_by_name)
     redis.zrange "devices", 0, -1, (err, devices) ->
       async.map devices, ((device, cb) ->
         redis.get "device:#{device}:model", (err, model) ->

@@ -15,7 +15,8 @@
     "node-salesforce": "0.6.x",
     "node-uuid":       "1.4.x",
     "redis-url":       "0.1.x",
-    "sockjs":          "0.3.x"
+    "sockjs":          "0.3.x",
+    "strftime":        "0.6.x"
   },
 
   "engines": {
