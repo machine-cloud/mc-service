@@ -113,7 +113,7 @@ check_rules = (message) ->
                   when "chatter"
                     body =
                       messageSegments: [
-                        { type: "mention", id: process.env.CHATTER_MENTION_ID },
+                        { type: "mention", id: matched_rule.action.salesforce.userId },
                         { type: "text", text: " " },
                         { type: "text", text: matched_rule.action.value || "Testing Chatter" }
                       ]
