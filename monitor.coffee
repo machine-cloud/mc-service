@@ -100,32 +100,35 @@ check_rules = (message) ->
             return unless locked is 1
             redis.expire "rule:#{matched_rule._id}", parseInt(process.env.RULE_TIMEOUT || "30"), (err, foo) ->
               if matched_rule.action.device is "salesforce"
-                force = new sf.Connection(instanceUrl:process.env.SALESFORCE_INSTANCE_URL, accessToken:matched_rule.action.salesforce.client.oauthToken)
-                switch matched_rule.action.input
-                  when "case"
-                    force.sobject('Case').create
-                      OwnerId: process.env.OWNER_ID || "005i0000000dHa7"
-                      Reason: "Device Offline"
-                      ContactId: process.env.CONTACT_ID || '003i0000008BypF'
-                      Device_Id__c: matched_rule.condition.device
-                      (err, ret) ->
-                        if err then log.error(err) else log.success case:ret.id
-                  when "chatter"
-                    body =
-                      createdById: process.env.CHATTER_POSTER_ID,
-                      messageSegments: [
-                        { type: "mention", id: matched_rule.action.salesforce.userId },
-                        { type: "text", text: " " },
-                        { type: "text", text: matched_rule.action.value || "Testing Chatter" }
-                      ]
-                    force._request
-                      method: "POST"
-                      url: force.urls.rest.base + "/chatter/feeds/record/#{process.env.CHATTER_GROUP_ID}/feed-items"
-                      body: JSON.stringify(body:body)
-                      headers:
-                        "Content-Type": "application/json"
-                      (err, data) ->
-                        if err then log.error(err) else log.success chatter:data.id
+                force = new sf.Connection()
+                force.login process.env.RULE_USERNAME, process.env.RULE_PASSWORD, (err, user) ->
+                  console.log "err", err
+                  console.log "user", user
+                  switch matched_rule.action.input
+                    when "case"
+                      force.sobject('Case').create
+                        OwnerId: process.env.OWNER_ID || "005i0000000dHa7"
+                        Reason: "Device Offline"
+                        ContactId: process.env.CONTACT_ID || '003i0000008BypF'
+                        Device_Id__c: matched_rule.condition.device
+                        (err, ret) ->
+                          if err then log.error(err) else log.success case:ret.id
+                    when "chatter"
+                      body =
+                        createdById: process.env.CHATTER_POSTER_ID,
+                        messageSegments: [
+                          { type: "mention", id: matched_rule.action.salesforce.userId },
+                          { type: "text", text: " " },
+                          { type: "text", text: matched_rule.action.value || "Testing Chatter" }
+                        ]
+                      force._request
+                        method: "POST"
+                        url: force.urls.rest.base + "/chatter/feeds/record/#{process.env.CHATTER_GROUP_ID}/feed-items"
+                        body: JSON.stringify(body:body)
+                        headers:
+                          "Content-Type": "application/json"
+                        (err, data) ->
+                          if err then log.error(err) else log.success chatter:data.id
               else
                 dd.delay 500, ->
                   mqtt.publish "device.#{matched_rule.action.device}", JSON.stringify(key:matched_rule.action.input, value:matched_rule.action.value)
