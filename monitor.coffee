@@ -114,6 +114,7 @@ check_rules = (message) ->
                     body =
                       messageSegments: [
                         { type: "mention", id: process.env.CHATTER_MENTION_ID },
+                        { type: "text", text: " " },
                         { type: "text", text: matched_rule.action.value || "Testing Chatter" }
                       ]
                     force._request
