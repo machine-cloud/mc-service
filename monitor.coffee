@@ -113,8 +113,8 @@ check_rules = (message) ->
                   when "chatter"
                     body =
                       messageSegments: [
-                        type: "Text"
-                        text: matched_rule.action.value || "Testing Chatter"
+                        { type: "mention", id: process.env.CHATTER_MENTION_ID },
+                        { type: "text", text: matched_rule.action.value || "Testing Chatter" }
                       ]
                     force._request
                       method: "POST"
