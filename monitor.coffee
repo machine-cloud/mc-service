@@ -112,6 +112,7 @@ check_rules = (message) ->
                         if err then log.error(err) else log.success case:ret.id
                   when "chatter"
                     body =
+                      createdById: process.env.CHATTER_POSTER_ID,
                       messageSegments: [
                         { type: "mention", id: matched_rule.action.salesforce.userId },
                         { type: "text", text: " " },
